@@ -576,7 +576,7 @@ class Bot:
 
     # whisper function
     def transcribe(self, filename: str) -> str:
-    logger.info("Start transcribe!")
+        logger.info("Start transcribe!")
 
     segments, info = self.model.transcribe(
         filename,
