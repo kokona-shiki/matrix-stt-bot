@@ -576,13 +576,70 @@ class Bot:
 
     # whisper function
     def transcribe(self, filename: str) -> str:
-        logger.info("Start transcribe!")
-        segments, _ = self.model.transcribe(filename, vad_filter=True)
-        message = ""
-        for segment in segments:
-            message += segment.text
+    logger.info("Start transcribe!")
 
-        return message
+    segments, info = self.model.transcribe(
+        filename,
+
+        # 中文为主，英文可以自然出现在结果中
+        language="zh",
+        task="transcribe",
+
+        # 非常重要：避免前一个 segment 的错误结果污染后面的结果
+        condition_on_previous_text=False,
+
+        # 解码
+        beam_size=5,
+        temperature=0.0,
+
+        # VAD
+        vad_filter=True,
+        vad_parameters={
+            "threshold": 0.5,
+            "min_speech_duration_ms": 250,
+            "min_silence_duration_ms": 500,
+            "speech_pad_ms": 300,
+        },
+
+        # 防止无语音区域产生幻觉
+        no_speech_threshold=0.6,
+        log_prob_threshold=-1.0,
+        compression_ratio_threshold=2.4,
+
+        # 中文 + 英语混合提示
+        initial_prompt=(
+            "这是一段普通话和英语混合的语音。"
+            "请准确转写说话内容。"
+            "中文保持中文，英文保持英文。"
+            "保留英文单词、英文缩写、"
+            "软件名称、产品名称和技术术语。"
+        ),
+    )
+
+    logger.info(
+        f"Detected language: {info.language}, "
+        f"probability: {info.language_probability}"
+    )
+
+    message = ""
+
+    for segment in segments:
+        text = segment.text.strip()
+
+        if not text:
+            continue
+
+        logger.info(
+            f"[{segment.start:.2f}s -> {segment.end:.2f}s] "
+            f"prob={segment.avg_logprob:.3f}, "
+            f"no_speech={segment.no_speech_prob:.3f}, "
+            f"compression={segment.compression_ratio:.3f}, "
+            f"text={text!r}"
+        )
+
+        message += text
+
+    return message.strip()
 
 
 async def main():
