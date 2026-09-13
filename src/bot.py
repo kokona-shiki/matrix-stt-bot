@@ -630,11 +630,8 @@ class Bot:
             continue
 
         logger.info(
-            f"[{segment.start:.2f}s -> {segment.end:.2f}s] "
-            f"prob={segment.avg_logprob:.3f}, "
-            f"no_speech={segment.no_speech_prob:.3f}, "
-            f"compression={segment.compression_ratio:.3f}, "
-            f"text={text!r}"
+            f"Detected language: {info.language}, "
+            f"probability: {info.language_probability:.2f}"
         )
 
         message += text
