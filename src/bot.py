@@ -734,12 +734,12 @@ class Bot:
             # Voice Activity Detection
             # -----------------------------------------------------
             vad_filter=True,
-            vad_parameters={
-                "threshold": 0.5,
-                "min_speech_duration_ms": 250,
-                "min_silence_duration_ms": 500,
-                "speech_pad_ms": 300,
-            },
+            #vad_parameters={
+            #    "threshold": 0.5,
+            #    "min_speech_duration_ms": 250,
+            #    "min_silence_duration_ms": 500,
+            #    "speech_pad_ms": 300,
+            #},
 
             # -----------------------------------------------------
             # Silence / hallucination protection
